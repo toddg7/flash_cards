@@ -62,21 +62,31 @@ class Round
 
   def take_turn(guess)
     current_turn = Turn.new(guess, @current_card)
+    totals_update(current_turn.card.category, current_turn.correct?)
     if current_turn.correct?
       @number_correct += 1
-      number_correct_by_category(current_turn.card.category)
     end
     @turns << current_turn
     @count += 1
     @current_card = @deck.cards[@count]
   end
 
-  def number_correct_by_category(category)
+  def totals_update(category, correct_bool)
     if @totals[category]
-      @totals[category] += 1
+      @totals[category][:total] += 1
+      if correct_bool
+        @totals[category][:number_correct] += 1
+      end
     else
-      @totals[category] = 0
+      @totals[category] = {:total => 1, :number_correct => 0}
+      if correct_bool
+        @totals[category][:number_correct] += 1
+      end
     end
+  end
+
+  def number_correct_by_category(category)
+    @totals[category][:number_correct]
   end
 
   def percent_correct
@@ -84,7 +94,11 @@ class Round
   end
 
   def percent_correct_by_category(category)
-    @totals[category].to_f / @count.to_f * 100
+    if @totals[category][:total] == 0
+      0.0
+    else
+      @totals[category][:number_correct].to_f / @totals[category][:total].to_f * 100
+    end
   end
 end
 
@@ -96,3 +110,4 @@ round = Round.new(deck)
 round.take_turn('Juneau')
 round.take_turn('Venus')
 puts round.percent_correct_by_category(:Geography)
+puts round.current_card
