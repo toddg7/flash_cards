@@ -1,3 +1,10 @@
+filename = 'flash_cards.txt'
+file = File.open(filename, 'r').read
+lines = []
+file.each_line do |line|
+  lines << line.chomp.split(',')
+end
+
 # trivia/flash card
 class Card
   attr_accessor :question, :answer, :category
@@ -67,7 +74,7 @@ class Round
     @deck.cards.each do
       take_turn
     end
-    puts "GAME OVER"
+    puts 'GAME OVER'
     puts "You had #{@number_correct} correct guesses out of #{@deck.count} for a total score of #{percent_correct.to_i}%."
     @totals.keys.each do |key|
       puts "#{key} - #{percent_correct_by_category(key)}% correct."
@@ -77,7 +84,7 @@ class Round
   def take_turn
     puts "This is card number #{@count + 1} out of #{deck.count}."
     puts @current_card.question
-    guess = gets().chomp
+    guess = gets.chomp
     current_turn = Turn.new(guess, @current_card)
     puts current_turn.feedback
     totals_update(current_turn.card.category, current_turn.correct?)
@@ -113,9 +120,12 @@ class Round
   end
 end
 
-card1 = Card.new('What is the capital of Alaska?', 'Juneau', :Geography)
-card2 = Card.new('The Viking spacecraft sent back to Earth photographs and reports about the surface of which planet?', 'Mars', :STEM)
-card3 = Card.new('Describe in words the exact direction that is 697.5° clockwise from due north?', 'North north west', :STEM)
+# card1 = Card.new('What is the capital of Alaska?', 'Juneau', :Geography)
+# card2 = Card.new('The Viking spacecraft sent back to Earth photographs and reports about the surface of which planet?', 'Mars', :STEM)
+# card3 = Card.new('Describe in words the exact direction that is 697.5 degrees clockwise from due north?', 'North north west', :STEM)
+card1 = Card.new(lines[0][0], lines[0][1], lines[0][2])
+card2 = Card.new(lines[1][0], lines[1][1], lines[1][2])
+card3 = Card.new(lines[2][0], lines[2][1], lines[2][2])
 deck = Deck.new([card1, card2, card3])
 round = Round.new(deck)
 round.start
